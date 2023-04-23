@@ -918,17 +918,17 @@ async function setup() {
     // Callback
     await processQueue(QUEUE_AFTER_SETUP, null);
 }
-let loading = false;
+let is_loading = false;
 onUiUpdate(async () => {
-    if (loading) return;
+    if (is_loading) return;
     if (Object.keys(opts).length === 0) return;
     if (CFG) return;
-    loading = true;
+    is_loading = true;
     // Get our tag base path from the temp file
     tagBasePath = await readFile(`tmp/tagAutocompletePath.txt`);
     // Load config from webui opts
     await syncOptions();
     // Rest of setup
     setup();
-    loading = false;
+    is_loading = false;
 });
