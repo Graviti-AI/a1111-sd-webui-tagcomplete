@@ -53,6 +53,7 @@ const autocompleteCSS = `
     }
     .resultsFlexContainer {
         display: flex;
+        color: darkmagenta;
     }
     .acListItem {
         white-space: break-spaces;
