@@ -39,8 +39,9 @@ except AttributeError:
 
 def find_ext_wildcard_paths():
     """Returns the path to the extension wildcards folder"""
-    found = list(EXT_PATH.glob('*/wildcards/'))
-    return found
+    # found = list(EXT_PATH.glob('*/wildcards/'))
+    # return found
+    return []
 
 
 # The path to the extension wildcards folder
@@ -53,50 +54,52 @@ TEMP_PATH = TAGS_PATH.joinpath('temp') # Extension specific temp files
 
 def get_wildcards():
     """Returns a list of all wildcards. Works on nested folders."""
-    wildcard_files = list(WILDCARD_PATH.rglob("*.txt"))
-    resolved = [w.relative_to(WILDCARD_PATH).as_posix(
-    ) for w in wildcard_files if w.name != "put wildcards here.txt"]
-    return resolved
+    # wildcard_files = list(WILDCARD_PATH.rglob("*.txt"))
+    # resolved = [w.relative_to(WILDCARD_PATH).as_posix(
+    # ) for w in wildcard_files if w.name != "put wildcards here.txt"]
+    # return resolved
+    return []
 
 
 def get_ext_wildcards():
     """Returns a list of all extension wildcards. Works on nested folders."""
     wildcard_files = []
 
-    for path in WILDCARD_EXT_PATHS:
-        wildcard_files.append(path.relative_to(FILE_DIR).as_posix())
-        wildcard_files.extend(p.relative_to(path).as_posix() for p in path.rglob("*.txt") if p.name != "put wildcards here.txt")
-        wildcard_files.append("-----")
+    # for path in WILDCARD_EXT_PATHS:
+    #     wildcard_files.append(path.relative_to(FILE_DIR).as_posix())
+    #     wildcard_files.extend(p.relative_to(path).as_posix() for p in path.rglob("*.txt") if p.name != "put wildcards here.txt")
+    #     wildcard_files.append("-----")
 
     return wildcard_files
 
 
 def get_ext_wildcard_tags():
     """Returns a list of all tags found in extension YAML files found under a Tags: key."""
-    wildcard_tags = {} # { tag: count }
-    yaml_files = []
-    for path in WILDCARD_EXT_PATHS:
-        yaml_files.extend(p for p in path.rglob("*.yml"))
-        yaml_files.extend(p for p in path.rglob("*.yaml"))
-    count = 0
-    for path in yaml_files:
-        try:
-            with open(path, encoding="utf8") as file:
-                data = yaml.safe_load(file)
-                for item in data:
-                    if data[item] and 'Tags' in data[item]:
-                        wildcard_tags[count] = ','.join(data[item]['Tags'])
-                        count += 1
-                    else:
-                        print('Issue with tags found in ' + path.name + ' at item ' + item)
-        except yaml.YAMLError as exc:
-            print(exc)
-    # Sort by count
-    sorted_tags = sorted(wildcard_tags.items(), key=lambda item: item[1], reverse=True)
-    output = []
-    for tag, count in sorted_tags:
-        output.append(f"{tag},{count}")
-    return output
+    # wildcard_tags = {} # { tag: count }
+    # yaml_files = []
+    # for path in WILDCARD_EXT_PATHS:
+    #     yaml_files.extend(p for p in path.rglob("*.yml"))
+    #     yaml_files.extend(p for p in path.rglob("*.yaml"))
+    # count = 0
+    # for path in yaml_files:
+    #     try:
+    #         with open(path, encoding="utf8") as file:
+    #             data = yaml.safe_load(file)
+    #             for item in data:
+    #                 if data[item] and 'Tags' in data[item]:
+    #                     wildcard_tags[count] = ','.join(data[item]['Tags'])
+    #                     count += 1
+    #                 else:
+    #                     print('Issue with tags found in ' + path.name + ' at item ' + item)
+    #     except yaml.YAMLError as exc:
+    #         print(exc)
+    # # Sort by count
+    # sorted_tags = sorted(wildcard_tags.items(), key=lambda item: item[1], reverse=True)
+    # output = []
+    # for tag, count in sorted_tags:
+    #     output.append(f"{tag},{count}")
+    # return output
+    return []
 
 
 def get_embeddings(sd_model):
@@ -109,49 +112,49 @@ def get_embeddings(sd_model):
     emb_v2 = []
     results = []
 
-    try:
-        # Get embedding dict from sd_hijack to separate v1/v2 embeddings
-        emb_type_a = sd_hijack.model_hijack.embedding_db.word_embeddings
-        emb_type_b = sd_hijack.model_hijack.embedding_db.skipped_embeddings
-        # Get the shape of the first item in the dict
-        emb_a_shape = -1
-        emb_b_shape = -1
-        if (len(emb_type_a) > 0):
-            emb_a_shape = next(iter(emb_type_a.items()))[1].shape
-        if (len(emb_type_b) > 0):
-            emb_b_shape = next(iter(emb_type_b.items()))[1].shape
+    # try:
+    #     # Get embedding dict from sd_hijack to separate v1/v2 embeddings
+    #     emb_type_a = sd_hijack.model_hijack.embedding_db.word_embeddings
+    #     emb_type_b = sd_hijack.model_hijack.embedding_db.skipped_embeddings
+    #     # Get the shape of the first item in the dict
+    #     emb_a_shape = -1
+    #     emb_b_shape = -1
+    #     if (len(emb_type_a) > 0):
+    #         emb_a_shape = next(iter(emb_type_a.items()))[1].shape
+    #     if (len(emb_type_b) > 0):
+    #         emb_b_shape = next(iter(emb_type_b.items()))[1].shape
 
-        # Add embeddings to the correct list
-        if (emb_a_shape == V1_SHAPE):
-            emb_v1 = list(emb_type_a.keys())
-        elif (emb_a_shape == V2_SHAPE):
-            emb_v2 = list(emb_type_a.keys())
+    #     # Add embeddings to the correct list
+    #     if (emb_a_shape == V1_SHAPE):
+    #         emb_v1 = list(emb_type_a.keys())
+    #     elif (emb_a_shape == V2_SHAPE):
+    #         emb_v2 = list(emb_type_a.keys())
 
-        if (emb_b_shape == V1_SHAPE):
-            emb_v1 = list(emb_type_b.keys())
-        elif (emb_b_shape == V2_SHAPE):
-            emb_v2 = list(emb_type_b.keys())
+    #     if (emb_b_shape == V1_SHAPE):
+    #         emb_v1 = list(emb_type_b.keys())
+    #     elif (emb_b_shape == V2_SHAPE):
+    #         emb_v2 = list(emb_type_b.keys())
 
-        # Get shape of current model
-        #vec = sd_model.cond_stage_model.encode_embedding_init_text(",", 1)
-        #model_shape = vec.shape[1]
-        # Show relevant entries at the top
-        #if (model_shape == V1_SHAPE):
-        #    results = [e + ",v1" for e in emb_v1] + [e + ",v2" for e in emb_v2]
-        #elif (model_shape == V2_SHAPE):
-        #    results = [e + ",v2" for e in emb_v2] + [e + ",v1" for e in emb_v1]
-        #else:
-        #    raise AttributeError # Fallback to old method
-        results = sorted([e + ",v1" for e in emb_v1] + [e + ",v2" for e in emb_v2], key=lambda x: x.lower())
-    except AttributeError:
-        print("tag_autocomplete_helper: Old webui version or unrecognized model shape, using fallback for embedding completion.")
-        # Get a list of all embeddings in the folder
-        all_embeds = [str(e.relative_to(EMB_PATH)) for e in EMB_PATH.rglob("*") if e.suffix in {".bin", ".pt", ".png",'.webp', '.jxl', '.avif'}]
-        # Remove files with a size of 0
-        all_embeds = [e for e in all_embeds if EMB_PATH.joinpath(e).stat().st_size > 0]
-        # Remove file extensions
-        all_embeds = [e[:e.rfind('.')] for e in all_embeds]
-        results = [e + "," for e in all_embeds]
+    #     # Get shape of current model
+    #     #vec = sd_model.cond_stage_model.encode_embedding_init_text(",", 1)
+    #     #model_shape = vec.shape[1]
+    #     # Show relevant entries at the top
+    #     #if (model_shape == V1_SHAPE):
+    #     #    results = [e + ",v1" for e in emb_v1] + [e + ",v2" for e in emb_v2]
+    #     #elif (model_shape == V2_SHAPE):
+    #     #    results = [e + ",v2" for e in emb_v2] + [e + ",v1" for e in emb_v1]
+    #     #else:
+    #     #    raise AttributeError # Fallback to old method
+    #     results = sorted([e + ",v1" for e in emb_v1] + [e + ",v2" for e in emb_v2], key=lambda x: x.lower())
+    # except AttributeError:
+    #     print("tag_autocomplete_helper: Old webui version or unrecognized model shape, using fallback for embedding completion.")
+    #     # Get a list of all embeddings in the folder
+    #     all_embeds = [str(e.relative_to(EMB_PATH)) for e in EMB_PATH.rglob("*") if e.suffix in {".bin", ".pt", ".png",'.webp', '.jxl', '.avif'}]
+    #     # Remove files with a size of 0
+    #     all_embeds = [e for e in all_embeds if EMB_PATH.joinpath(e).stat().st_size > 0]
+    #     # Remove file extensions
+    #     all_embeds = [e[:e.rfind('.')] for e in all_embeds]
+    #     results = [e + "," for e in all_embeds]
 
     write_to_temp_file('emb.txt', results)
 
@@ -159,25 +162,28 @@ def get_hypernetworks():
     """Write a list of all hypernetworks"""
 
     # Get a list of all hypernetworks in the folder
-    all_hypernetworks = [str(h.name) for h in HYP_PATH.rglob("*") if h.suffix in {".pt"}]
-    # Remove file extensions
-    return sorted([h[:h.rfind('.')] for h in all_hypernetworks], key=lambda x: x.lower())
+    # all_hypernetworks = [str(h.name) for h in HYP_PATH.rglob("*") if h.suffix in {".pt"}]
+    # # Remove file extensions
+    # return sorted([h[:h.rfind('.')] for h in all_hypernetworks], key=lambda x: x.lower())
+    return []
 
 def get_lora():
     """Write a list of all lora"""
 
     # Get a list of all lora in the folder
-    all_lora = [str(l.name) for l in LORA_PATH.rglob("*") if l.suffix in {".safetensors", ".ckpt", ".pt"}]
-    # Remove file extensions
-    return sorted([l[:l.rfind('.')] for l in all_lora], key=lambda x: x.lower())
+    # all_lora = [str(l.name) for l in LORA_PATH.rglob("*") if l.suffix in {".safetensors", ".ckpt", ".pt"}]
+    # # Remove file extensions
+    # return sorted([l[:l.rfind('.')] for l in all_lora], key=lambda x: x.lower())
+    return []
 
 def get_lyco():
     """Write a list of all LyCORIS/LOHA from https://github.com/KohakuBlueleaf/a1111-sd-webui-lycoris"""
 
     # Get a list of all LyCORIS in the folder
-    all_lyco = [str(ly.name) for ly in LYCO_PATH.rglob("*") if ly.suffix in {".safetensors", ".ckpt", ".pt"}]
-    # Remove file extensions
-    return sorted([ly[:ly.rfind('.')] for ly in all_lyco], key=lambda x: x.lower())
+    # all_lyco = [str(ly.name) for ly in LYCO_PATH.rglob("*") if ly.suffix in {".safetensors", ".ckpt", ".pt"}]
+    # # Remove file extensions
+    # return sorted([ly[:ly.rfind('.')] for ly in all_lyco], key=lambda x: x.lower())
+    return []
 
 def write_tag_base_path():
     """Writes the tag base path to a fixed location temporary file"""
