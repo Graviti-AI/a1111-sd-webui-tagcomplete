@@ -38,11 +38,15 @@ function parseCSV(str) {
 }
 
 // Load file
-async function readFile(filePath, json = false, cache = false, cdn = false) {
+async function readFile(filePath, json = false, cache = false, cdn = false, version = false) {
     const url = new URL("file=" + filePath, window.location);
 
     if (!cache) {
         url.searchParams.set('t', new Date().getTime());
+    }
+
+    if (version) {
+        url.searchParams.set('v', version);
     }
 
     if (cdn && opts["assets_cdn_url"]) {
@@ -65,9 +69,11 @@ async function readFile(filePath, json = false, cache = false, cdn = false) {
         return await response.text();
 }
 
+const CSV_VERSION = 1;
+
 // Load CSV
 async function loadCSV(path) {
-    let text = await readFile(path, false, true, true);
+    let text = await readFile(path, false, true, true, CSV_VERSION);
     return parseCSV(text);
 }
 
