@@ -38,11 +38,21 @@ function parseCSV(str) {
 }
 
 // Load file
-async function readFile(filePath, json = false, cache = false) {
-    if (!cache)
-        filePath += `?${new Date().getTime()}`;
-        
-    let response = await fetch(`file=${filePath}`);
+async function readFile(filePath, json = false, cache = false, cdn = false) {
+    const url = new URL("file=" + filePath, window.location);
+
+    if (!cache) {
+        url.searchParams.set('t', new Date().getTime());
+    }
+
+    if (cdn && opts["assets_cdn_url"]) {
+        const cdnUrl = new URL(opts["assets_cdn_url"]);
+
+        url.protocol = cdnUrl.protocol;
+        url.hostname = cdnUrl.hostname;
+    }
+
+    let response = await fetch(url);
 
     if (response.status != 200) {
         console.error(`Error loading file "${filePath}": ` + response.status, response.statusText);
@@ -57,7 +67,7 @@ async function readFile(filePath, json = false, cache = false) {
 
 // Load CSV
 async function loadCSV(path) {
-    let text = await readFile(path);
+    let text = await readFile(path, false, true, true);
     return parseCSV(text);
 }
 
